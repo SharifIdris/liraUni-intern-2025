@@ -14,7 +14,217 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          content: string
+          created_at: string
+          generated_content: string | null
+          id: string
+          location: Json | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["activity_status"]
+          submitted_at: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          location?: Json | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["activity_status"]
+          submitted_at?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          location?: Json | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["activity_status"]
+          submitted_at?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      attendance_records: {
+        Row: {
+          activities_count: number
+          created_at: string
+          date: string
+          generated_by: string | null
+          id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["attendance_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activities_count?: number
+          created_at?: string
+          date: string
+          generated_by?: string | null
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activities_count?: number
+          created_at?: string
+          date?: string
+          generated_by?: string | null
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      channels: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          intern_ids: string[] | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          intern_ids?: string[] | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          intern_ids?: string[] | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          activity_id: string
+          content: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          content: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      departments: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          department_id: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          student_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department_id?: string | null
+          full_name: string
+          id: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          student_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department_id?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          student_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +233,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      activity_status: "pending" | "approved" | "rejected"
+      attendance_status: "present" | "absent" | "partial"
+      user_role: "intern" | "staff" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +362,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      activity_status: ["pending", "approved", "rejected"],
+      attendance_status: ["present", "absent", "partial"],
+      user_role: ["intern", "staff", "admin"],
+    },
   },
 } as const
