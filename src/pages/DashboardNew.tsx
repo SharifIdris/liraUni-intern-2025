@@ -17,7 +17,7 @@ import InternManagement from '@/components/staff/InternManagement';
 import PrintableAttendance from '@/components/reports/PrintableAttendance';
 import PrintableWeeklyReport from '@/components/reports/PrintableWeeklyReport';
 import ProfileSettings from '@/components/profile/ProfileSettings';
-import { CommentSection } from '@/components/comments/CommentSection';
+// import { CommentSection } from '@/components/comments/CommentSection';
 
 import { 
   Plus, 
@@ -184,11 +184,11 @@ const DashboardNew = () => {
                           )}
                         </div>
 
-                        {/* Comments Section */}
-                        <CommentSection 
+                        {/* Comments Section - Temporarily disabled */}
+                        {/* <CommentSection 
                           activityId={activity.id} 
                           isReadOnly={profile?.role === 'intern'}
-                        />
+                        /> */}
                       </div>
                     ))}
                 </div>
@@ -198,7 +198,14 @@ const DashboardNew = () => {
         );
 
       case 'pending':
-        return <ActivityReview />;
+        return (
+          <div className="space-y-6">
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-semibold mb-4">Pending Reviews</h2>
+              <p className="text-muted-foreground">Feature coming soon for reviewing intern activities</p>
+            </div>
+          </div>
+        );
 
       case 'channels':
         if (selectedChannel) {

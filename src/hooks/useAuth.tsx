@@ -9,6 +9,7 @@ interface Profile {
   role: 'intern' | 'staff' | 'admin';
   department_id: string | null;
   phone: string | null;
+  avatar_url: string | null;
 }
 
 interface AuthContextType {

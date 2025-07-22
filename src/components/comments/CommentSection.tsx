@@ -43,23 +43,18 @@ export function CommentSection({ activityId, isReadOnly = false }: CommentSectio
     setLoading(true);
     const { data, error } = await supabase
       .from('comments')
-      .select(`
-        *,
-        profiles (
-          full_name,
-          avatar_url,
-          role
-        )
-      `)
+      .select('*, profiles!inner(*)')
       .eq('activity_id', activityId)
       .order('created_at', { ascending: true });
 
     if (error) {
+      console.error('Comments fetch error:', error);
       toast({
         title: "Error",
         description: "Failed to load comments",
         variant: "destructive",
       });
+      setComments([]);
     } else {
       setComments(data || []);
     }
