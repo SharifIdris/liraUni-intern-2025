@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Plus, 
@@ -17,6 +18,8 @@ import {
   User
 } from 'lucide-react';
 import ActivityForm from '@/components/activities/ActivityForm';
+import ProfileSettings from '@/components/profile/ProfileSettings';
+import PrintableWeeklyReport from '@/components/reports/PrintableWeeklyReport';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Activity {
@@ -169,97 +172,115 @@ const InternDashboard = () => {
           </Card>
         </div>
 
-        {/* Add Activity Button */}
-        <div className="mb-8">
-          <Button 
-            onClick={() => setShowActivityForm(true)}
-            className="bg-gradient-to-r from-university-blue to-primary hover:from-primary-hover hover:to-university-blue transition-all duration-300"
-            size="lg"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Submit New Activity
-          </Button>
-        </div>
+        <Tabs defaultValue="activities" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="activities">My Activities</TabsTrigger>
+            <TabsTrigger value="reports">Weekly Report</TabsTrigger>
+            <TabsTrigger value="profile">Profile Settings</TabsTrigger>
+          </TabsList>
 
-        {/* Activities List */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-foreground">Your Activities</h2>
-          
-          {activities.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">No activities yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Start by submitting your first internship activity
-                </p>
-                <Button 
-                  onClick={() => setShowActivityForm(true)}
-                  className="bg-gradient-to-r from-university-blue to-primary hover:from-primary-hover hover:to-university-blue transition-all duration-300"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Submit Activity
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4">
-              {activities.map((activity) => (
-                <Card key={activity.id} className="hover:shadow-card transition-all duration-200">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{activity.title}</CardTitle>
-                        <CardDescription className="flex items-center gap-4 mt-2">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {formatDistanceToNow(new Date(activity.submitted_at), { addSuffix: true })}
-                          </span>
-                          {activity.location && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
-                              Location captured
-                            </span>
-                          )}
-                        </CardDescription>
-                      </div>
-                      {getStatusBadge(activity.status)}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="font-medium text-sm text-muted-foreground mb-1">Activity Description</h4>
-                        <p className="text-sm text-foreground">{activity.content}</p>
-                      </div>
-                      
-                      {activity.generated_content && (
-                        <div>
-                          <h4 className="font-medium text-sm text-muted-foreground mb-1">AI Enhanced Description</h4>
-                          <p className="text-sm text-foreground bg-university-light-blue/10 p-3 rounded-md">
-                            {activity.generated_content}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+          <TabsContent value="activities" className="space-y-4">
+            {/* Add Activity Button */}
+            <div className="mb-8">
+              <Button 
+                onClick={() => setShowActivityForm(true)}
+                className="bg-gradient-to-r from-university-blue to-primary hover:from-primary-hover hover:to-university-blue transition-all duration-300"
+                size="lg"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Submit New Activity
+              </Button>
+            </div>
+
+            {/* Activities List */}
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-foreground">Your Activities</h2>
+              
+              {activities.length === 0 ? (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-foreground mb-2">No activities yet</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Start by submitting your first internship activity
+                    </p>
+                    <Button 
+                      onClick={() => setShowActivityForm(true)}
+                      className="bg-gradient-to-r from-university-blue to-primary hover:from-primary-hover hover:to-university-blue transition-all duration-300"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Submit Activity
+                    </Button>
                   </CardContent>
                 </Card>
-              ))}
+              ) : (
+                <div className="grid gap-4">
+                  {activities.map((activity) => (
+                    <Card key={activity.id} className="hover:shadow-card transition-all duration-200">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="text-lg">{activity.title}</CardTitle>
+                            <CardDescription className="flex items-center gap-4 mt-2">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-4 h-4" />
+                                {formatDistanceToNow(new Date(activity.submitted_at), { addSuffix: true })}
+                              </span>
+                              {activity.location && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="w-4 h-4" />
+                                  Location captured
+                                </span>
+                              )}
+                            </CardDescription>
+                          </div>
+                          {getStatusBadge(activity.status)}
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div>
+                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Activity Description</h4>
+                            <p className="text-sm text-foreground">{activity.content}</p>
+                          </div>
+                          
+                          {activity.generated_content && (
+                            <div>
+                              <h4 className="font-medium text-sm text-muted-foreground mb-1">AI Enhanced Description</h4>
+                              <p className="text-sm text-foreground bg-university-light-blue/10 p-3 rounded-md">
+                                {activity.generated_content}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </TabsContent>
 
-      {/* Activity Form Modal */}
-      {showActivityForm && (
-        <ActivityForm 
-          onClose={() => setShowActivityForm(false)}
-          onSuccess={() => {
-            setShowActivityForm(false);
-            fetchActivities();
-          }}
-        />
-      )}
+          <TabsContent value="reports" className="space-y-4">
+            <PrintableWeeklyReport />
+          </TabsContent>
+
+          <TabsContent value="profile" className="space-y-4">
+            <ProfileSettings />
+          </TabsContent>
+        </Tabs>
+
+        {/* Activity Form Modal */}
+        {showActivityForm && (
+          <ActivityForm 
+            onClose={() => setShowActivityForm(false)}
+            onSuccess={() => {
+              setShowActivityForm(false);
+              fetchActivities();
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };

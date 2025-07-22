@@ -237,17 +237,7 @@ const ActivityReview = ({ activity, onClose, onSuccess }: ActivityReviewProps) =
               </div>
             </div>
 
-            {activity.generated_content && (
-              <div>
-                <Label className="text-base font-semibold flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-university-blue" />
-                  AI Enhanced Description
-                </Label>
-                <div className="mt-2 p-4 bg-university-light-blue/10 rounded-lg border">
-                  <p className="text-sm text-foreground whitespace-pre-wrap">{activity.generated_content}</p>
-                </div>
-              </div>
-            )}
+            {/* AI Enhanced Content removed from staff review as requested */}
 
             {locationData && (
               <div>

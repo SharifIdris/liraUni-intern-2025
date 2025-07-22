@@ -17,6 +17,10 @@ import {
   MessageSquare
 } from 'lucide-react';
 import ActivityReview from '@/components/activities/ActivityReview';
+import ProfileSettings from '@/components/profile/ProfileSettings';
+import ChannelManagement from '@/components/channels/ChannelManagement';
+import InternManagement from '@/components/staff/InternManagement';
+import PrintableAttendance from '@/components/reports/PrintableAttendance';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Activity {
@@ -211,15 +215,19 @@ const StaffDashboard = () => {
 
         {/* Activities Tabs */}
         <Tabs defaultValue="pending" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:w-auto md:grid-cols-2">
+          <TabsList className="grid w-full grid-cols-6 md:w-auto">
             <TabsTrigger value="pending" className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
-              Pending Review ({pendingActivities.length})
+              Pending ({pendingActivities.length})
             </TabsTrigger>
             <TabsTrigger value="reviewed" className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
               Reviewed ({reviewedActivities.length})
             </TabsTrigger>
+            <TabsTrigger value="channels">Channels</TabsTrigger>
+            <TabsTrigger value="interns">Interns</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending">
@@ -336,6 +344,22 @@ const StaffDashboard = () => {
                 </div>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="channels" className="space-y-4">
+            <ChannelManagement />
+          </TabsContent>
+
+          <TabsContent value="interns" className="space-y-4">
+            <InternManagement />
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-4">
+            <PrintableAttendance />
+          </TabsContent>
+
+          <TabsContent value="profile" className="space-y-4">
+            <ProfileSettings />
           </TabsContent>
         </Tabs>
       </div>
