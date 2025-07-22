@@ -10,15 +10,14 @@ import { supabase } from '@/integrations/supabase/client';
 
 // Import components
 import ActivityFormEnhanced from '@/components/activities/ActivityFormEnhanced';
-import ActivityReview from '@/components/activities/ActivityReview';
+import { PendingReview } from '@/components/activities/PendingReview';
 import ChannelManagement from '@/components/channels/ChannelManagement';
 import { ChannelChat } from '@/components/channels/ChannelChat';
 import InternManagement from '@/components/staff/InternManagement';
-import PrintableAttendance from '@/components/reports/PrintableAttendance';
 import PrintableWeeklyReport from '@/components/reports/PrintableWeeklyReport';
 import ProfileSettings from '@/components/profile/ProfileSettings';
-// import { CommentSection } from '@/components/comments/CommentSection';
-import { AIAssistant } from '@/components/ai/AIAssistant';
+import { SystemSettings } from '@/components/settings/SystemSettings';
+import { CommentSection } from '@/components/comments/CommentSection';
 
 import { 
   Plus, 
@@ -185,11 +184,13 @@ const DashboardNew = () => {
                           )}
                         </div>
 
-                        {/* Comments Section - Temporarily disabled */}
-                        {/* <CommentSection 
-                          activityId={activity.id} 
-                          isReadOnly={profile?.role === 'intern'}
-                        /> */}
+                        {/* Comments Section */}
+                        <div className="border-t pt-3">
+                          <CommentSection 
+                            activityId={activity.id} 
+                            isReadOnly={profile?.role === 'intern'}
+                          />
+                        </div>
                       </div>
                     ))}
                 </div>
@@ -199,14 +200,7 @@ const DashboardNew = () => {
         );
 
       case 'pending':
-        return (
-          <div className="space-y-6">
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-semibold mb-4">Pending Reviews</h2>
-              <p className="text-muted-foreground">Feature coming soon for reviewing intern activities</p>
-            </div>
-          </div>
-        );
+        return <PendingReview />;
 
       case 'channels':
         if (selectedChannel) {
@@ -234,10 +228,8 @@ const DashboardNew = () => {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {channels
-                    .filter(channel => 
-                      profile?.role !== 'intern' || 
-                      channel.intern_ids?.includes(profile?.id)
-                    )
+                  // Allow all users to view and interact with channels
+                  .filter(channel => true)
                     .map((channel) => (
                       <Card 
                         key={channel.id} 
@@ -272,26 +264,19 @@ const DashboardNew = () => {
       case 'reports':
         return (
           <div className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              <PrintableAttendance />
-              {profile?.role === 'intern' && <PrintableWeeklyReport />}
-            </div>
-          </div>
-        );
-
-      case 'ai-assistant':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center gap-2 mb-6">
-              <h1 className="text-3xl font-bold">AI Assistant</h1>
-              <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">Enhanced</span>
-            </div>
-            <AIAssistant />
+            {profile?.role === 'intern' ? (
+              <PrintableWeeklyReport />
+            ) : (
+              <div className="text-center py-12">
+                <h2 className="text-2xl font-semibold mb-4">Reports</h2>
+                <p className="text-muted-foreground">Staff and Admin reporting features coming soon</p>
+              </div>
+            )}
           </div>
         );
 
       case 'settings':
-        return <ProfileSettings />;
+        return profile?.role === 'admin' ? <SystemSettings /> : <ProfileSettings />;
 
       default:
         return null;

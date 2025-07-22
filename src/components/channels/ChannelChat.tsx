@@ -1,21 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Send, Paperclip, Smile } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Send, 
-  Paperclip, 
-  Image as ImageIcon, 
-  File,
-  Users,
-  ArrowLeft 
-} from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
 
 interface Message {
   id: string;
@@ -310,42 +301,46 @@ export function ChannelChat({ channel, onBack }: ChannelChatProps) {
         
         {/* Message Input */}
         <div className="border-t p-4">
-          <div className="flex gap-2">
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              onChange={handleFileUpload}
-              accept="image/*,.pdf,.doc,.docx,.txt"
-            />
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="px-3"
-            >
-              <Paperclip className="h-4 w-4" />
-            </Button>
-            
-            <Input
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type a message..."
-              disabled={loading || uploading}
-              className="flex-1"
-            />
-            
-            <Button
-              onClick={sendMessage}
-              disabled={!newMessage.trim() || loading || uploading}
-              size="sm"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                  title="Upload file"
+                >
+                  <Paperclip className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    // Simple emoji picker - add common emojis to message
+                    const emojis = ['😀', '😊', '👍', '❤️', '😂', '🔥', '👏', '🎉'];
+                    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    setNewMessage(prev => prev + randomEmoji);
+                  }}
+                  title="Add emoji"
+                >
+                  <Smile className="h-4 w-4" />
+                </Button>
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept="image/*,video/*,.pdf,.doc,.docx"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Input
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Type your message..."
+                  className="flex-1"
+                />
+                <Button onClick={sendMessage} disabled={!newMessage.trim() && !uploading}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
           
           {uploading && (
             <p className="text-xs text-muted-foreground mt-2">

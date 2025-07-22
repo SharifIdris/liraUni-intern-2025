@@ -46,7 +46,7 @@ export function AppSidebar() {
     { title: 'Activity', url: '#activity', icon: Activity, role: 'all' },
     { title: 'Pending Reviews', url: '#pending', icon: Clock, badge: '3', role: 'staff' },
     { title: 'Channels', url: '#channels', icon: MessageSquare, role: 'all' },
-    { title: 'AI Assistant', url: '#ai-assistant', icon: Brain, role: 'all' },
+  { title: 'AI Assistant', url: '#ai-assistant', icon: Brain, role: 'all' },
     { title: 'Interns', url: '#interns', icon: Users, role: 'staff' },
     { title: 'Reports', url: '#reports', icon: FileText, role: 'all' },
     { title: 'Settings', url: '#settings', icon: Settings, role: 'all' },

@@ -15,9 +15,9 @@ interface Comment {
   user_id: string;
   activity_id: string;
   profiles?: {
-    full_name?: string;
+    full_name: string;
     avatar_url?: string;
-    role?: string;
+    role: string;
   } | null;
 }
 
@@ -41,38 +41,37 @@ export function CommentSection({ activityId, isReadOnly = false }: CommentSectio
   const fetchComments = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data: commentsData } = await supabase
         .from('comments')
-        .select(`
-          *,
-          profiles (
-            full_name,
-            avatar_url,
-            role
-          )
-        `)
+        .select('*')
         .eq('activity_id', activityId)
         .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error('Comments fetch error:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load comments",
-          variant: "destructive",
-        });
-        setComments([]);
-      } else {
-        // Handle the case where profiles might be null or have different structure
-        const formattedComments = (data || []).map(comment => ({
-          ...comment,
-          profiles: comment.profiles || null
-        }));
-        setComments(formattedComments);
+      if (commentsData) {
+        // Fetch profile data separately for each comment
+        const commentsWithProfiles = await Promise.all(
+          commentsData.map(async (comment) => {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('full_name, avatar_url, role')
+              .eq('id', comment.user_id)
+              .single();
+            
+            return {
+              ...comment,
+              profiles: profileData
+            };
+          })
+        );
+        setComments(commentsWithProfiles);
       }
     } catch (error) {
-      console.error('Unexpected error:', error);
-      setComments([]);
+      console.error('Error fetching comments:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load comments",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -83,21 +82,14 @@ export function CommentSection({ activityId, isReadOnly = false }: CommentSectio
 
     setSubmitting(true);
     try {
-      const { data, error } = await supabase
+      const { data: newCommentData, error } = await supabase
         .from('comments')
         .insert({
           content: newComment,
           activity_id: activityId,
           user_id: profile.id,
         })
-        .select(`
-          *,
-          profiles (
-            full_name,
-            avatar_url,
-            role
-          )
-        `)
+        .select()
         .single();
 
       if (error) {
@@ -107,7 +99,17 @@ export function CommentSection({ activityId, isReadOnly = false }: CommentSectio
           variant: "destructive",
         });
       } else {
-        setComments(prev => [...prev, data]);
+        // Fetch profile data for the new comment
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url, role')
+          .eq('id', profile.id)
+          .single();
+
+        setComments(prev => [...prev, {
+          ...newCommentData,
+          profiles: profileData
+        }]);
         setNewComment('');
         toast({
           title: "Success",
