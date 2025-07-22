@@ -23,7 +23,9 @@ import {
   Settings,
   CheckCircle,
   AlertCircle,
+  Brain,
 } from 'lucide-react';
+import logoImage from '/lovable-uploads/6eead968-e67b-4251-8efb-3fd17c54669a.png';
 
 interface NavigationItem {
   title: string;
@@ -44,6 +46,7 @@ export function AppSidebar() {
     { title: 'Activity', url: '#activity', icon: Activity, role: 'all' },
     { title: 'Pending Reviews', url: '#pending', icon: Clock, badge: '3', role: 'staff' },
     { title: 'Channels', url: '#channels', icon: MessageSquare, role: 'all' },
+    { title: 'AI Assistant', url: '#ai-assistant', icon: Brain, role: 'all' },
     { title: 'Interns', url: '#interns', icon: Users, role: 'staff' },
     { title: 'Reports', url: '#reports', icon: FileText, role: 'all' },
     { title: 'Settings', url: '#settings', icon: Settings, role: 'all' },
@@ -77,6 +80,23 @@ export function AppSidebar() {
       className={`${collapsed ? 'w-16' : 'w-64'} border-r border-sidebar-border transition-all duration-300`}
     >
       <SidebarContent className="bg-sidebar">
+        {/* Logo and Branding */}
+        <div className={`p-4 border-b border-sidebar-border ${collapsed ? 'px-2' : ''}`}>
+          <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
+            <img 
+              src={logoImage} 
+              alt="LIRA University Logo" 
+              className="h-10 w-10 object-contain rounded-lg"
+            />
+            {!collapsed && (
+              <div className="flex-1">
+                <h2 className="text-lg font-bold text-sidebar-foreground">LIRA University</h2>
+                <p className="text-xs text-sidebar-foreground/70">Intern Management</p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* User Profile Section */}
         <div className={`p-4 border-b border-sidebar-border ${collapsed ? 'px-2' : ''}`}>
           <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>

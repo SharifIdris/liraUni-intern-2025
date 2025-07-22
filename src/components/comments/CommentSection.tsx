@@ -1,24 +1,24 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { MessageSquare, Send, User } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { MessageSquare, Send } from 'lucide-react';
 
 interface Comment {
   id: string;
   content: string;
   created_at: string;
   user_id: string;
-  profiles: {
-    full_name: string;
+  activity_id: string;
+  profiles?: {
+    full_name?: string;
     avatar_url?: string;
-    role: string;
-  };
+    role?: string;
+  } | null;
 }
 
 interface CommentSectionProps {
@@ -27,196 +27,172 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ activityId, isReadOnly = false }: CommentSectionProps) {
-  const { profile } = useAuth();
-  const { toast } = useToast();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const { profile } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchComments();
-    subscribeToComments();
   }, [activityId]);
 
   const fetchComments = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*, profiles!inner(*)')
-      .eq('activity_id', activityId)
-      .order('created_at', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .select(`
+          *,
+          profiles (
+            full_name,
+            avatar_url,
+            role
+          )
+        `)
+        .eq('activity_id', activityId)
+        .order('created_at', { ascending: true });
 
-    if (error) {
-      console.error('Comments fetch error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load comments",
-        variant: "destructive",
-      });
+      if (error) {
+        console.error('Comments fetch error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load comments",
+          variant: "destructive",
+        });
+        setComments([]);
+      } else {
+        // Handle the case where profiles might be null or have different structure
+        const formattedComments = (data || []).map(comment => ({
+          ...comment,
+          profiles: comment.profiles || null
+        }));
+        setComments(formattedComments);
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
       setComments([]);
-    } else {
-      setComments(data || []);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
-
-  const subscribeToComments = () => {
-    const channel = supabase
-      .channel(`comments:${activityId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'comments',
-          filter: `activity_id=eq.${activityId}`,
-        },
-        async (payload) => {
-          // Fetch the complete comment with profile data
-          const { data } = await supabase
-            .from('comments')
-            .select(`
-              *,
-              profiles (
-                full_name,
-                avatar_url,
-                role
-              )
-            `)
-            .eq('id', payload.new.id)
-            .single();
-
-          if (data) {
-            setComments(prev => [...prev, data]);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   };
 
   const submitComment = async () => {
-    if (!newComment.trim() || submitting) return;
+    if (!newComment.trim() || !profile) return;
 
     setSubmitting(true);
-    const { error } = await supabase
-      .from('comments')
-      .insert({
-        activity_id: activityId,
-        user_id: profile?.id,
-        content: newComment.trim(),
-      });
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .insert({
+          content: newComment,
+          activity_id: activityId,
+          user_id: profile.id,
+        })
+        .select(`
+          *,
+          profiles (
+            full_name,
+            avatar_url,
+            role
+          )
+        `)
+        .single();
 
-    if (error) {
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to submit comment",
+          variant: "destructive",
+        });
+      } else {
+        setComments(prev => [...prev, data]);
+        setNewComment('');
+        toast({
+          title: "Success",
+          description: "Comment added successfully",
+        });
+      }
+    } catch (error) {
+      console.error('Comment submission error:', error);
       toast({
         title: "Error",
         description: "Failed to submit comment",
         variant: "destructive",
       });
-    } else {
-      setNewComment('');
-      toast({
-        title: "Success",
-        description: "Comment added successfully",
-      });
-    }
-    setSubmitting(false);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
-      e.preventDefault();
-      submitComment();
+    } finally {
+      setSubmitting(false);
     }
   };
-
-  const canComment = profile?.role === 'staff' || profile?.role === 'admin';
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-base">
+          <MessageSquare className="h-4 w-4" />
           Comments ({comments.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Comments List */}
-        <div className="space-y-4 max-h-96 overflow-y-auto">
-          {loading ? (
-            <div className="text-center text-muted-foreground py-4">
-              Loading comments...
-            </div>
-          ) : comments.length === 0 ? (
-            <div className="text-center text-muted-foreground py-4">
-              No comments yet. Be the first to leave feedback!
-            </div>
-          ) : (
-            comments.map((comment) => (
-              <div key={comment.id} className="flex gap-3">
-                <Avatar className="h-8 w-8 flex-shrink-0">
-                  <AvatarImage src={comment.profiles?.avatar_url} />
-                  <AvatarFallback className="text-xs">
+        {loading ? (
+          <div className="text-center py-4">
+            <p className="text-sm text-muted-foreground">Loading comments...</p>
+          </div>
+        ) : comments.length === 0 ? (
+          <div className="text-center py-4">
+            <p className="text-sm text-muted-foreground">No comments yet. Be the first to comment!</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {comments.map((comment) => (
+              <div key={comment.id} className="flex gap-3 p-3 bg-muted/50 rounded-lg">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage 
+                    src={comment.profiles?.avatar_url} 
+                    alt={comment.profiles?.full_name || 'User'} 
+                  />
+                  <AvatarFallback>
                     {comment.profiles?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-medium">
-                      {comment.profiles?.full_name}
-                    </span>
-                    <span className="text-xs text-muted-foreground capitalize">
-                      {comment.profiles?.role}
+                      {comment.profiles?.full_name || 'Unknown User'}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                      {new Date(comment.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="text-sm bg-muted rounded-lg p-3">
-                    {comment.content}
-                  </div>
+                  <p className="text-sm">{comment.content}</p>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-
-        {/* Comment Input */}
-        {!isReadOnly && canComment && (
-          <div className="border-t pt-4">
-            <div className="space-y-3">
-              <Textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder="Leave feedback for this activity... (Ctrl+Enter to submit)"
-                className="min-h-[80px]"
-              />
-              <div className="flex justify-between items-center">
-                <p className="text-xs text-muted-foreground">
-                  Use Ctrl+Enter to submit quickly
-                </p>
-                <Button
-                  onClick={submitComment}
-                  disabled={!newComment.trim() || submitting}
-                  size="sm"
-                >
-                  <Send className="h-4 w-4 mr-2" />
-                  {submitting ? 'Sending...' : 'Send'}
-                </Button>
-              </div>
-            </div>
+            ))}
           </div>
         )}
 
-        {!isReadOnly && !canComment && (
-          <div className="text-center text-muted-foreground text-sm py-2 bg-muted/50 rounded-lg">
-            Only staff members can leave comments
+        {/* Comment Form */}
+        {!isReadOnly && (
+          <div className="space-y-2">
+            <Textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Add a comment..."
+              className="min-h-[60px]"
+              disabled={submitting}
+            />
+            <div className="flex justify-end">
+              <Button 
+                onClick={submitComment}
+                disabled={!newComment.trim() || submitting}
+                size="sm"
+              >
+                <Send className="h-4 w-4 mr-1" />
+                {submitting ? 'Submitting...' : 'Comment'}
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

@@ -18,6 +18,7 @@ import PrintableAttendance from '@/components/reports/PrintableAttendance';
 import PrintableWeeklyReport from '@/components/reports/PrintableWeeklyReport';
 import ProfileSettings from '@/components/profile/ProfileSettings';
 // import { CommentSection } from '@/components/comments/CommentSection';
+import { AIAssistant } from '@/components/ai/AIAssistant';
 
 import { 
   Plus, 
@@ -275,6 +276,17 @@ const DashboardNew = () => {
               <PrintableAttendance />
               {profile?.role === 'intern' && <PrintableWeeklyReport />}
             </div>
+          </div>
+        );
+
+      case 'ai-assistant':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 mb-6">
+              <h1 className="text-3xl font-bold">AI Assistant</h1>
+              <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">Enhanced</span>
+            </div>
+            <AIAssistant />
           </div>
         );
 

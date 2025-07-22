@@ -8,9 +8,17 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* University Color Palette */
-    --background: 0 0% 99%;
-    --foreground: 220 15% 15%;
+  /* LIRA University Brand Colors */
+  --lira-primary: 220 91% 42%;
+  --lira-secondary: 45 100% 51%;
+  --lira-accent: 210 100% 98%;
+  
+  /* Background image */
+  --bg-university: url('/lovable-uploads/9a18fc07-4d76-4c3a-b269-aad67a7d7a5b.png');
+
+  /* University Color Palette */
+  --background: 0 0% 99%;
+  --foreground: 220 15% 15%;
 
     --card: 0 0% 100%;
     --card-foreground: 220 15% 15%;

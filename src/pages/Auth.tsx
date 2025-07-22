@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap, Users, Shield, Chrome, Github, Facebook } from 'lucide-react';
+import logoImage from '/lovable-uploads/6eead968-e67b-4251-8efb-3fd17c54669a.png';
+import backgroundImage from '/lovable-uploads/9a18fc07-4d76-4c3a-b269-aad67a7d7a5b.png';
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
@@ -133,20 +135,32 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-university-light-blue via-background to-muted flex items-center justify-center p-4">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-university-blue to-primary rounded-full flex items-center justify-center mb-4 shadow-university">
-            <GraduationCap className="w-8 h-8 text-primary-foreground" />
+          <div className="mx-auto mb-4 flex justify-center">
+            <img 
+              src={logoImage} 
+              alt="LIRA University Logo" 
+              className="h-24 w-24 object-contain"
+            />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Lira University</h1>
-          <p className="text-muted-foreground">Internship Activity Tracker</p>
+          <h1 className="text-3xl font-bold text-white mb-2">LIRA University</h1>
+          <p className="text-gray-200">Internship Activity Tracker</p>
         </div>
 
-        <Card className="shadow-elevated border-0">
+        <Card className="shadow-elevated border-0 bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome</CardTitle>
+            <CardTitle className="text-2xl text-primary">Welcome</CardTitle>
             <CardDescription>
               Sign in to your account or create a new one
             </CardDescription>
