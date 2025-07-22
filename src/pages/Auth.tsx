@@ -7,12 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap, Users, Shield } from 'lucide-react';
+import { GraduationCap, Users, Shield, Chrome, Github, Facebook } from 'lucide-react';
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+  const { signIn, signUp, signInWithOAuth } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -105,6 +107,31 @@ const Auth = () => {
     }
   };
 
+  const handleOAuthSignIn = async (provider: 'google' | 'github' | 'facebook') => {
+    setOauthLoading(provider);
+    
+    try {
+      const { error } = await signInWithOAuth(provider);
+      
+      if (error) {
+        toast({
+          title: "Sign In Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+      // Note: OAuth redirect will handle success case
+    } catch (error) {
+      toast({
+        title: "Sign In Failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setOauthLoading(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-university-light-blue via-background to-muted flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -169,6 +196,59 @@ const Auth = () => {
                     {loading ? 'Signing In...' : 'Sign In'}
                   </Button>
                 </form>
+
+                {/* OAuth Section */}
+                <div className="mt-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <Separator className="w-full" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3 mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleOAuthSignIn('google')}
+                      disabled={oauthLoading !== null}
+                      className="relative"
+                    >
+                      {oauthLoading === 'google' ? (
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Chrome className="w-4 h-4" />
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => handleOAuthSignIn('github')}
+                      disabled={oauthLoading !== null}
+                      className="relative"
+                    >
+                      {oauthLoading === 'github' ? (
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Github className="w-4 h-4" />
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => handleOAuthSignIn('facebook')}
+                      disabled={oauthLoading !== null}
+                      className="relative"
+                    >
+                      {oauthLoading === 'facebook' ? (
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Facebook className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </TabsContent>
 
               <TabsContent value="signup">
@@ -241,6 +321,59 @@ const Auth = () => {
                     {loading ? 'Creating Account...' : 'Create Account'}
                   </Button>
                 </form>
+
+                {/* OAuth Section for Sign Up */}
+                <div className="mt-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <Separator className="w-full" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-card px-2 text-muted-foreground">Or sign up with</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3 mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleOAuthSignIn('google')}
+                      disabled={oauthLoading !== null}
+                      className="relative"
+                    >
+                      {oauthLoading === 'google' ? (
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Chrome className="w-4 h-4" />
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => handleOAuthSignIn('github')}
+                      disabled={oauthLoading !== null}
+                      className="relative"
+                    >
+                      {oauthLoading === 'github' ? (
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Github className="w-4 h-4" />
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => handleOAuthSignIn('facebook')}
+                      disabled={oauthLoading !== null}
+                      className="relative"
+                    >
+                      {oauthLoading === 'facebook' ? (
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Facebook className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
