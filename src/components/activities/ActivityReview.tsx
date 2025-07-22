@@ -64,17 +64,35 @@ const ActivityReview = ({ activity, onClose, onSuccess }: ActivityReviewProps) =
 
   const fetchComments = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: commentsData, error } = await supabase
         .from('comments')
-        .select(`
-          *,
-          profiles(full_name, role)
-        `)
+        .select('id, content, created_at, user_id, activity_id, updated_at')
         .eq('activity_id', activity.id)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setComments(data || []);
+
+      if (commentsData && commentsData.length > 0) {
+        // Fetch user profiles for comments
+        const userIds = commentsData.map(comment => comment.user_id);
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name, role')
+          .in('id', userIds);
+
+        // Merge the data
+        const enrichedComments = commentsData.map(comment => {
+          const profile = profilesData?.find(p => p.id === comment.user_id);
+          return {
+            ...comment,
+            profiles: profile || { full_name: 'Unknown User', role: 'unknown' }
+          };
+        });
+
+        setComments(enrichedComments);
+      } else {
+        setComments([]);
+      }
     } catch (error) {
       console.error('Error fetching comments:', error);
     } finally {

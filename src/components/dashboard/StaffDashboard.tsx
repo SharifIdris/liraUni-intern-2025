@@ -47,16 +47,34 @@ const StaffDashboard = () => {
 
   const fetchActivities = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: activitiesData, error } = await supabase
         .from('activities')
-        .select(`
-          *,
-          profiles(full_name, student_id)
-        `)
+        .select('id, user_id, title, content, generated_content, location, status, submitted_at, reviewed_at, reviewed_by, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setActivities(data || []);
+
+      if (activitiesData && activitiesData.length > 0) {
+        // Fetch user profiles for activities
+        const userIds = activitiesData.map(activity => activity.user_id);
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name, student_id')
+          .in('id', userIds);
+
+        // Merge the data
+        const enrichedActivities = activitiesData.map(activity => {
+          const profile = profilesData?.find(p => p.id === activity.user_id);
+          return {
+            ...activity,
+            profiles: profile || { full_name: 'Unknown User', student_id: 'N/A' }
+          };
+        });
+
+        setActivities(enrichedActivities);
+      } else {
+        setActivities([]);
+      }
     } catch (error) {
       console.error('Error fetching activities:', error);
       toast({
