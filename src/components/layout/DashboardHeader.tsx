@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useAuth } from '@/hooks/useAuth';
+import { SimpleNotificationSystem } from '@/components/notifications/SimpleNotificationSystem';
 
 interface DashboardHeaderProps {
   onSearch?: (query: string) => void;
