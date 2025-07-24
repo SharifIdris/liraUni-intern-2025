@@ -215,7 +215,7 @@ const StaffDashboard = () => {
 
         {/* Activities Tabs */}
         <Tabs defaultValue="pending" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 md:w-auto">
+          <TabsList className="grid w-full grid-cols-3 md:w-auto">
             <TabsTrigger value="pending" className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
               Pending ({pendingActivities.length})
@@ -226,8 +226,6 @@ const StaffDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="channels">Channels</TabsTrigger>
             <TabsTrigger value="interns">Interns</TabsTrigger>
-            <TabsTrigger value="reports">Reports</TabsTrigger>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending">
@@ -354,13 +352,6 @@ const StaffDashboard = () => {
             <InternManagement />
           </TabsContent>
 
-          <TabsContent value="reports" className="space-y-4">
-            <PrintableAttendance />
-          </TabsContent>
-
-          <TabsContent value="profile" className="space-y-4">
-            <ProfileSettings />
-          </TabsContent>
         </Tabs>
       </div>
 

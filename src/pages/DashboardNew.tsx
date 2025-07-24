@@ -14,9 +14,6 @@ import { PendingReview } from '@/components/activities/PendingReview';
 import ChannelManagement from '@/components/channels/ChannelManagement';
 import { ChannelChat } from '@/components/channels/ChannelChat';
 import InternManagement from '@/components/staff/InternManagement';
-import PrintableWeeklyReport from '@/components/reports/PrintableWeeklyReport';
-import ProfileSettings from '@/components/profile/ProfileSettings';
-import { SystemSettings } from '@/components/settings/SystemSettings';
 import { CommentSection } from '@/components/comments/CommentSection';
 
 import { 
@@ -25,10 +22,7 @@ import {
   Clock, 
   Activity,
   MessageSquare,
-  Users,
-  FileText,
-  Filter,
-  ArrowLeft
+  Filter
 } from 'lucide-react';
 
 const DashboardNew = () => {
@@ -226,10 +220,12 @@ const DashboardNew = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {channels
-                  // Allow all users to view and interact with channels
-                  .filter(channel => true)
+                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                   {channels
+                     .filter(channel => 
+                       profile?.role !== 'intern' || 
+                       (channel.intern_ids && channel.intern_ids.includes(profile.id))
+                     )
                     .map((channel) => (
                       <Card 
                         key={channel.id} 
@@ -261,22 +257,6 @@ const DashboardNew = () => {
       case 'interns':
         return <InternManagement />;
 
-      case 'reports':
-        return (
-          <div className="space-y-6">
-            {profile?.role === 'intern' ? (
-              <PrintableWeeklyReport />
-            ) : (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-semibold mb-4">Reports</h2>
-                <p className="text-muted-foreground">Staff and Admin reporting features coming soon</p>
-              </div>
-            )}
-          </div>
-        );
-
-      case 'settings':
-        return profile?.role === 'admin' ? <SystemSettings /> : <ProfileSettings />;
 
       default:
         return null;
@@ -297,7 +277,7 @@ const DashboardNew = () => {
     <DashboardLayout 
       onTabChange={handleTabChange}
       onSearch={handleSearch}
-      onProfileClick={() => setActiveTab('settings')}
+      onProfileClick={() => {/* Profile actions handled by header */}}
     >
       {/* Dashboard Stats */}
       <DashboardStats stats={stats} role={profile.role} />

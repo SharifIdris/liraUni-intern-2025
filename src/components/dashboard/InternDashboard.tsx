@@ -15,11 +15,10 @@ import {
   XCircle, 
   AlertCircle,
   LogOut,
-  User
+  MessageSquare
 } from 'lucide-react';
 import ActivityForm from '@/components/activities/ActivityForm';
-import ProfileSettings from '@/components/profile/ProfileSettings';
-import PrintableWeeklyReport from '@/components/reports/PrintableWeeklyReport';
+import { ChannelChat } from '@/components/channels/ChannelChat';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Activity {
@@ -37,11 +36,14 @@ const InternDashboard = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [showActivityForm, setShowActivityForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [channels, setChannels] = useState([]);
+  const [selectedChannel, setSelectedChannel] = useState<any>(null);
   const { profile, signOut } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
     fetchActivities();
+    fetchChannels();
   }, []);
 
   const fetchActivities = async () => {
@@ -62,6 +64,20 @@ const InternDashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchChannels = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('channels')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setChannels(data || []);
+    } catch (error) {
+      console.error('Error fetching channels:', error);
     }
   };
 
@@ -173,10 +189,9 @@ const InternDashboard = () => {
         </div>
 
         <Tabs defaultValue="activities" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="activities">My Activities</TabsTrigger>
-            <TabsTrigger value="reports">Weekly Report</TabsTrigger>
-            <TabsTrigger value="profile">Profile Settings</TabsTrigger>
+            <TabsTrigger value="channels">Channels</TabsTrigger>
           </TabsList>
 
           <TabsContent value="activities" className="space-y-4">
@@ -261,12 +276,67 @@ const InternDashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="reports" className="space-y-4">
-            <PrintableWeeklyReport />
-          </TabsContent>
-
-          <TabsContent value="profile" className="space-y-4">
-            <ProfileSettings />
+          <TabsContent value="channels" className="space-y-4">
+            {selectedChannel ? (
+              <ChannelChat 
+                channel={selectedChannel} 
+                onBack={() => setSelectedChannel(null)}
+              />
+            ) : (
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      Available Channels
+                    </CardTitle>
+                    <CardDescription>
+                      Join conversations with your team
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {channels
+                        .filter(channel => 
+                          channel.intern_ids && channel.intern_ids.includes(profile.id)
+                        )
+                        .map((channel) => (
+                          <Card 
+                            key={channel.id} 
+                            className="cursor-pointer hover:shadow-md transition-shadow"
+                            onClick={() => setSelectedChannel(channel)}
+                          >
+                            <CardContent className="p-4">
+                              <h3 className="font-medium mb-2">{channel.name}</h3>
+                              <p className="text-sm text-muted-foreground mb-3">
+                                {channel.description}
+                              </p>
+                              <div className="flex items-center justify-between">
+                                <Badge variant="secondary" className="text-xs">
+                                  {channel.intern_ids?.length || 0} members
+                                </Badge>
+                                <Button variant="ghost" size="sm">
+                                  Join Chat
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                    </div>
+                    
+                    {channels.filter(channel => 
+                      channel.intern_ids && channel.intern_ids.includes(profile.id)
+                    ).length === 0 && (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">
+                          You haven't been added to any channels yet. 
+                          Contact your supervisor to be added to relevant channels.
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
 

@@ -176,10 +176,10 @@ export const PendingReview = () => {
                     <CardDescription>
                       Submitted by: {activity.profiles?.full_name || 'Unknown'}
                     </CardDescription>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>Activity Date: {new Date(activity.activity_date).toLocaleDateString()}</span>
-                      <span>Submitted: {new Date(activity.submitted_at).toLocaleDateString()}</span>
-                    </div>
+                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                       <span>Activity Date: {activity.activity_date ? new Date(activity.activity_date).toLocaleDateString() : 'Not specified'}</span>
+                       <span>Submitted: {new Date(activity.submitted_at).toLocaleDateString()}</span>
+                     </div>
                   </div>
                   <Badge variant="secondary">
                     <Clock className="h-3 w-3 mr-1" />
@@ -196,12 +196,12 @@ export const PendingReview = () => {
                   </p>
                 </div>
 
-                {activity.location && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="h-4 w-4" />
-                    <span>{activity.location.name}</span>
-                  </div>
-                )}
+                 {activity.location && activity.location.name && (
+                   <div className="flex items-center gap-2 text-sm">
+                     <MapPin className="h-4 w-4" />
+                     <span>{activity.location.name}</span>
+                   </div>
+                 )}
 
                 <div className="space-y-3">
                   <div>
