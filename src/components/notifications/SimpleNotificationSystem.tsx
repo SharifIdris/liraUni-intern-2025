@@ -34,90 +34,64 @@ export const SimpleNotificationSystem = () => {
   }, [profile]);
 
   const fetchNotifications = async () => {
-    // For now, we'll just use mock data since TypeScript types aren't updated yet
-    const mockNotifications: SimpleNotification[] = [
-      {
-        id: '1',
-        type: 'activity_submitted',
-        title: 'Welcome to LIRA University',
-        message: 'Your account has been set up successfully. Start by submitting your first activity!',
-        read: false,
-        created_at: new Date().toISOString(),
-        user_id: profile?.id || '',
-      },
-      {
-        id: '2',
-        type: 'new_message',
-        title: 'Channel Available',
-        message: 'You can now participate in team channels for better collaboration.',
-        read: true,
-        created_at: new Date(Date.now() - 3600000).toISOString(),
-        user_id: profile?.id || '',
-      }
-    ];
+    if (!profile?.id) return;
 
-    setNotifications(mockNotifications);
-    setUnreadCount(mockNotifications.filter(n => !n.read).length);
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        return;
+      }
+
+      const notifications = data || [];
+      setNotifications(notifications);
+      setUnreadCount(notifications.filter(n => !n.read).length);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
   };
 
   const subscribeToNotifications = () => {
-    // Subscribe to activities table for real-time updates
-    const activitiesChannel = supabase
-      .channel('activity-notifications')
+    if (!profile?.id) return;
+
+    // Subscribe to notifications table for real-time updates
+    const notificationsChannel = supabase
+      .channel('user-notifications')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'activities',
+          table: 'notifications',
+          filter: `user_id=eq.${profile.id}`,
         },
         (payload) => {
-          // Show toast for relevant activity updates
           if (payload.eventType === 'INSERT') {
-            if (profile?.role === 'staff' || profile?.role === 'admin') {
-              toast({
-                title: "New Activity Submitted",
-                description: "A new activity has been submitted for review",
-              });
-            }
-          } else if (payload.eventType === 'UPDATE' && payload.new.status !== payload.old?.status) {
-            if (payload.new.user_id === profile?.id) {
-              toast({
-                title: `Activity ${payload.new.status}`,
-                description: `Your activity "${payload.new.title}" has been ${payload.new.status}`,
-              });
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    // Subscribe to messages for real-time chat notifications
-    const messagesChannel = supabase
-      .channel('message-notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-        },
-        async (payload) => {
-          // Get message details
-          const { data: messageData } = await supabase
-            .from('messages')
-            .select(`
-              *,
-              profiles:user_id(full_name),
-              channels:channel_id(name)
-            `)
-            .eq('id', payload.new.id)
-            .single();
-
-          if (messageData && messageData.user_id !== profile?.id) {
+            const newNotification = payload.new as SimpleNotification;
+            setNotifications(prev => [newNotification, ...prev]);
+            setUnreadCount(prev => prev + 1);
+            
+            // Show toast for new notification
             toast({
-              title: `New message in ${messageData.channels?.name}`,
-              description: `${messageData.profiles?.full_name} sent a message`,
+              title: newNotification.title,
+              description: newNotification.message,
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedNotification = payload.new as SimpleNotification;
+            setNotifications(prev => 
+              prev.map(n => n.id === updatedNotification.id ? updatedNotification : n)
+            );
+            
+            // Update unread count
+            setNotifications(current => {
+              setUnreadCount(current.filter(n => !n.read).length);
+              return current;
             });
           }
         }
@@ -125,9 +99,23 @@ export const SimpleNotificationSystem = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(activitiesChannel);
-      supabase.removeChannel(messagesChannel);
+      supabase.removeChannel(notificationsChannel);
     };
+  };
+
+  const markAsRead = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
+
+      if (error) {
+        console.error('Error marking notification as read:', error);
+      }
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
   };
 
   const getNotificationIcon = (type: string) => {
@@ -144,27 +132,6 @@ export const SimpleNotificationSystem = () => {
     }
   };
 
-  // Create some mock notifications for demonstration
-  const mockNotifications: SimpleNotification[] = [
-    {
-      id: '1',
-      type: 'activity_submitted',
-      title: 'Welcome to LIRA University',
-      message: 'Your account has been set up successfully. Start by submitting your first activity!',
-      read: false,
-      created_at: new Date().toISOString(),
-      user_id: profile?.id || '',
-    },
-    {
-      id: '2',
-      type: 'new_message',
-      title: 'Channel Available',
-      message: 'You can now participate in team channels for better collaboration.',
-      read: true,
-      created_at: new Date(Date.now() - 3600000).toISOString(),
-      user_id: profile?.id || '',
-    }
-  ];
 
   return (
     <div className="relative">
@@ -216,6 +183,7 @@ export const SimpleNotificationSystem = () => {
                       className={`p-3 border-b hover:bg-muted/50 cursor-pointer ${
                         !notification.read ? 'bg-primary/5' : ''
                       }`}
+                      onClick={() => !notification.read && markAsRead(notification.id)}
                     >
                       <div className="flex items-start gap-3">
                         <div className={`p-1 rounded-full ${
