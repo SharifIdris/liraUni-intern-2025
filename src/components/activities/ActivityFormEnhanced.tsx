@@ -12,8 +12,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ActivityGenerator } from './ActivityGenerator';
-import { AIModelSelector } from '../ai/AIModelSelector';
+import { UnifiedActivityGenerator } from './UnifiedActivityGenerator';
 
 const ActivityFormEnhanced = () => {
   const { profile } = useAuth();
@@ -75,8 +74,7 @@ const ActivityFormEnhanced = () => {
 
   return (
     <div className="space-y-6">
-      <ActivityGenerator onGenerated={setContent} />
-      <AIModelSelector onGenerated={setContent} context="activity" />
+      <UnifiedActivityGenerator onGenerated={setContent} />
       
       <Card>
         <CardHeader>
