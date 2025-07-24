@@ -87,7 +87,7 @@ export function AppSidebar() {
             <img 
               src={logoImage} 
               alt="LIRA University Logo" 
-              className="h-10 w-10 object-contain rounded-lg"
+              className="h-10 w-10 object-contain rounded-full shadow-md"
             />
             {!collapsed && (
               <div className="flex-1">

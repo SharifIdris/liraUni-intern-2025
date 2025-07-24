@@ -151,7 +151,7 @@ const Auth = () => {
             <img 
               src={logoImage} 
               alt="LIRA University Logo" 
-              className="h-24 w-24 object-contain"
+              className="h-24 w-24 object-contain rounded-full shadow-lg border-4 border-white/20"
             />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">LIRA University</h1>
