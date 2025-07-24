@@ -15,6 +15,8 @@ import ChannelManagement from '@/components/channels/ChannelManagement';
 import { ChannelChat } from '@/components/channels/ChannelChat';
 import InternManagement from '@/components/staff/InternManagement';
 import { CommentSection } from '@/components/comments/CommentSection';
+import ProfileSettings from '@/components/profile/ProfileSettings';
+import PrintableWeeklyReport from '@/components/reports/PrintableWeeklyReport';
 
 import { 
   Plus, 
@@ -257,6 +259,11 @@ const DashboardNew = () => {
       case 'interns':
         return <InternManagement />;
 
+      case 'reports':
+        return <PrintableWeeklyReport />;
+
+      case 'profile':
+        return <ProfileSettings />;
 
       default:
         return null;
