@@ -33,34 +33,24 @@ const AI_MODELS: AIModel[] = [
     color: 'bg-gradient-to-r from-purple-500 to-pink-500'
   },
   {
-    id: 'microsoft/DialoGPT-medium',
-    name: 'DialoGPT Medium',
-    description: 'Conversational AI for creative writing and brainstorming',
-    provider: 'Hugging Face',
-    icon: <Brain className="h-4 w-4" />,
+    id: 'gemini-1.5-flash',
+    name: 'Gemini 1.5 Flash',
+    description: 'Google\'s fast and efficient multimodal AI model',
+    provider: 'Google',
+    icon: <Zap className="h-4 w-4" />,
     isPremium: false,
-    capabilities: ['Creative Writing', 'Brainstorming', 'Dialogue'],
+    capabilities: ['Fast Responses', 'Text Generation', 'Multimodal'],
     color: 'bg-blue-500'
   },
   {
-    id: 'google/flan-t5-base',
-    name: 'FLAN-T5 Base',
-    description: 'Instruction-following model for task completion',
-    provider: 'Hugging Face',
-    icon: <Target className="h-4 w-4" />,
+    id: 'gemini-1.5-pro',
+    name: 'Gemini 1.5 Pro',
+    description: 'Google\'s most capable model for complex tasks',
+    provider: 'Google',
+    icon: <Brain className="h-4 w-4" />,
     isPremium: false,
-    capabilities: ['Instructions', 'Summarization', 'Q&A'],
+    capabilities: ['Advanced Reasoning', 'Long Context', 'Complex Analysis'],
     color: 'bg-green-500'
-  },
-  {
-    id: 'facebook/blenderbot-400M-distill',
-    name: 'BlenderBot 400M',
-    description: 'Conversational AI for interactive discussions',
-    provider: 'Hugging Face',
-    icon: <Sparkles className="h-4 w-4" />,
-    isPremium: false,
-    capabilities: ['Conversation', 'Knowledge', 'Personality'],
-    color: 'bg-purple-500'
   }
 ];
 
@@ -129,8 +119,8 @@ export const UnifiedActivityGenerator = ({ onGenerated }: UnifiedActivityGenerat
           });
         }
       } else {
-        // Use Free Models
-        const { data, error } = await supabase.functions.invoke('free-ai-models', {
+        // Use Gemini Models
+        const { data, error } = await supabase.functions.invoke('gemini-ai', {
           body: {
             model: selectedModel,
             prompt: `Create a detailed activity report based on: ${description}. Include objectives, actions taken, outcomes, and learnings.`,
