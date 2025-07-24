@@ -20,6 +20,7 @@ import {
 import ActivityForm from '@/components/activities/ActivityForm';
 import { ChannelChat } from '@/components/channels/ChannelChat';
 import { formatDistanceToNow } from 'date-fns';
+import PrintableWeeklyReport from '@/components/reports/PrintableWeeklyReport';
 
 interface Activity {
   id: string;
@@ -189,9 +190,10 @@ const InternDashboard = () => {
         </div>
 
         <Tabs defaultValue="activities" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="activities">My Activities</TabsTrigger>
             <TabsTrigger value="channels">Channels</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
           </TabsList>
 
           <TabsContent value="activities" className="space-y-4">
@@ -337,6 +339,10 @@ const InternDashboard = () => {
                 </Card>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-6">
+            <PrintableWeeklyReport />
           </TabsContent>
         </Tabs>
 

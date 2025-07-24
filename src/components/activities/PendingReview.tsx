@@ -31,7 +31,7 @@ export const PendingReview = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState('');
+  const [feedback, setFeedback] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchPendingActivities();
@@ -91,13 +91,14 @@ export const PendingReview = () => {
       if (error) throw error;
 
       // Add feedback comment if provided
-      if (feedback.trim()) {
+      const activityFeedback = feedback[activityId] || '';
+      if (activityFeedback.trim()) {
         await supabase
           .from('comments')
           .insert({
             activity_id: activityId,
             user_id: profile?.id,
-            content: feedback
+            content: activityFeedback
           });
       }
 
@@ -108,7 +109,7 @@ export const PendingReview = () => {
 
       // Refresh the list
       fetchPendingActivities();
-      setFeedback('');
+      setFeedback(prev => ({ ...prev, [activityId]: '' }));
     } catch (error) {
       console.error('Error reviewing activity:', error);
       toast({
@@ -209,8 +210,8 @@ export const PendingReview = () => {
                     <Textarea
                       id={`feedback-${activity.id}`}
                       placeholder="Add feedback or comments for the intern..."
-                      value={feedback}
-                      onChange={(e) => setFeedback(e.target.value)}
+                      value={feedback[activity.id] || ''}
+                      onChange={(e) => setFeedback(prev => ({ ...prev, [activity.id]: e.target.value }))}
                       rows={3}
                     />
                   </div>
