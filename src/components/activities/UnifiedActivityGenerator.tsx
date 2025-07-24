@@ -139,6 +139,9 @@ export const UnifiedActivityGenerator = ({ onGenerated }: UnifiedActivityGenerat
         });
 
         if (error) throw error;
+        if (data?.error) {
+          throw new Error(data.details || data.error);
+        }
         if (data?.response) {
           onGenerated(data.response);
           toast({
