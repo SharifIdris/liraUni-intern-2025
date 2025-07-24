@@ -24,6 +24,7 @@ import {
   CheckCircle,
   AlertCircle,
   Brain,
+  Sparkles,
 } from 'lucide-react';
 import logoImage from '/lovable-uploads/6eead968-e67b-4251-8efb-3fd17c54669a.png';
 
@@ -46,6 +47,7 @@ export function AppSidebar() {
     { title: 'Activity', url: '#activity', icon: Activity, role: 'all' },
     { title: 'Pending Reviews', url: '#pending', icon: Clock, badge: '3', role: 'staff' },
     { title: 'Channels', url: '#channels', icon: MessageSquare, role: 'all' },
+    { title: 'AI Tools', url: '#ai-tools', icon: Sparkles, role: 'intern' },
     { title: 'Reports', url: '#reports', icon: FileText, role: 'intern' },
     { title: 'Profile Settings', url: '#profile', icon: Settings, role: 'all' },
     { title: 'Interns', url: '#interns', icon: Users, role: 'staff' },

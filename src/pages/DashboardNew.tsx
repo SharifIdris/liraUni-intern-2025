@@ -17,6 +17,7 @@ import InternManagement from '@/components/staff/InternManagement';
 import { CommentSection } from '@/components/comments/CommentSection';
 import ProfileSettings from '@/components/profile/ProfileSettings';
 import PrintableWeeklyReport from '@/components/reports/PrintableWeeklyReport';
+import { AIWorkspaceEnhancer } from '@/components/ai/AIWorkspaceEnhancer';
 
 import { 
   Plus, 
@@ -264,6 +265,9 @@ const DashboardNew = () => {
 
       case 'profile':
         return <ProfileSettings />;
+
+      case 'ai-tools':
+        return <AIWorkspaceEnhancer />;
 
       default:
         return null;

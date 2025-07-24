@@ -1,1 +1,7 @@
 project_id = "wdrapdfniyzltpzpsavn"
+
+[functions.ai-assistant]
+verify_jwt = true
+
+[functions.free-ai-models]
+verify_jwt = true
