@@ -330,6 +330,18 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_user_notifications: {
+        Args: { p_user_id: string }
+        Returns: {
+          id: string
+          type: string
+          title: string
+          message: string
+          read: boolean
+          created_at: string
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       activity_status: "pending" | "approved" | "rejected"

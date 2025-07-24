@@ -112,22 +112,40 @@ const ProfileSettings = () => {
   };
 
   const handleSave = async () => {
-    setLoading(true);
-    const { error } = await updateProfile(formData);
+    if (!profile) return;
     
-    if (error) {
+    setLoading(true);
+    try {
+      // Prepare update data, converting empty strings to null for UUID fields
+      const updateData = {
+        full_name: formData.full_name,
+        student_id: formData.student_id || null,
+        phone: formData.phone || null,
+        department_id: formData.department_id || null,
+        avatar_url: formData.avatar_url,
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updateData)
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
       toast({
         title: "Error",
         description: "Failed to update profile",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

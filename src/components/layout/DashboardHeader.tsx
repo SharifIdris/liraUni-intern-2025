@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, Bell, Settings, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -53,17 +54,8 @@ export function DashboardHeader({ onSearch, onProfileClick }: DashboardHeaderPro
 
         {/* Right side - Notifications and profile */}
         <div className="flex items-center gap-2">
-          {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="h-5 w-5" />
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center"
-            >
-              3
-            </Badge>
-          </Button>
-
+          <SimpleNotificationSystem />
+          
           {/* Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
