@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Phone, Building2, Save, Camera, Upload } from 'lucide-react';
+import { validateFileUpload, sanitizeErrorMessage } from '@/lib/security';
 
 const ProfileSettings = () => {
   const { profile, updateProfile } = useAuth();
@@ -50,11 +51,11 @@ const ProfileSettings = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    const validation = validateFileUpload(file);
+    if (!validation.valid) {
       toast({
         title: "Error",
-        description: "Please select an image file",
+        description: validation.error,
         variant: "destructive",
       });
       return;
@@ -140,7 +141,7 @@ const ProfileSettings = () => {
       console.error('Error updating profile:', error);
       toast({
         title: "Error",
-        description: "Failed to update profile",
+        description: sanitizeErrorMessage(error),
         variant: "destructive",
       });
     } finally {

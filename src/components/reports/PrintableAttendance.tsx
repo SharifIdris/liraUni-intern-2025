@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Printer, Calendar, FileText } from 'lucide-react';
 import { format } from 'date-fns';
+import { safePrintElement, sanitizeErrorMessage } from '@/lib/security';
 
 interface AttendanceRecord {
   id: string;
@@ -66,14 +67,7 @@ const PrintableAttendance = () => {
   };
 
   const handlePrint = () => {
-    const printContent = document.getElementById('attendance-report');
-    if (printContent) {
-      const originalContent = document.body.innerHTML;
-      document.body.innerHTML = printContent.innerHTML;
-      window.print();
-      document.body.innerHTML = originalContent;
-      window.location.reload();
-    }
+    safePrintElement('attendance-report');
   };
 
   useEffect(() => {

@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Printer, Calendar, FileText } from 'lucide-react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { safePrintElement, sanitizeErrorMessage } from '@/lib/security';
 
 interface WeeklyActivity {
   id: string;
@@ -61,14 +62,7 @@ const PrintableWeeklyReport = () => {
   };
 
   const handlePrint = () => {
-    const printContent = document.getElementById('weekly-report');
-    if (printContent) {
-      const originalContent = document.body.innerHTML;
-      document.body.innerHTML = printContent.innerHTML;
-      window.print();
-      document.body.innerHTML = originalContent;
-      window.location.reload();
-    }
+    safePrintElement('weekly-report');
   };
 
   const getLocationText = (location: any) => {
