@@ -123,8 +123,36 @@ export const UnifiedActivityGenerator = ({ onGenerated }: UnifiedActivityGenerat
         const { data, error } = await supabase.functions.invoke('gemini-ai', {
           body: {
             model: selectedModel,
-            prompt: `Create a detailed activity report based on: ${description}. Include objectives, actions taken, outcomes, and learnings.`,
-            context: 'activity'
+            prompt: `Generate a comprehensive, well-structured activity report based on this brief description: "${description}"
+
+Please format the report with the following sections:
+
+**ACTIVITY TITLE**
+[Create a clear, professional title for this activity]
+
+**DETAILED ACTIVITY DESCRIPTION**
+[Provide a comprehensive description of the activities performed, including specific tasks, processes, and methods used. Be detailed and professional.]
+
+**OBJECTIVES AND GOALS**
+[List the main objectives that were aimed to be achieved through this activity]
+
+**CHALLENGES FACED**
+[Describe specific challenges, obstacles, or difficulties encountered during the activity. Include both technical and non-technical challenges.]
+
+**LESSONS LEARNED**
+[Detail the key insights, knowledge, and skills gained from this experience. Include both professional and personal development aspects.]
+
+**OUTCOMES AND ACHIEVEMENTS**
+[Describe the results achieved, deliverables completed, and contributions made]
+
+**FUTURE APPLICATIONS**
+[Explain how the knowledge and experience gained can be applied in future work or studies]
+
+**REFLECTION**
+[Provide personal reflection on the overall experience and its value to professional development]
+
+Context: This is for a university intern reporting on their work activities. Make it comprehensive, professional, and demonstrate meaningful engagement with the work.`,
+            context: 'structured_activity_report'
           }
         });
 

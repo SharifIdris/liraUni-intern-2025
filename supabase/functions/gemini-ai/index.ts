@@ -22,8 +22,12 @@ serve(async (req) => {
     // Construct the full prompt with context if provided
     const fullPrompt = context ? `Context: ${context}\n\nRequest: ${prompt}` : prompt
 
-    // Use Gemini 1.5 Flash (free tier)
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
+    // Determine which Gemini model to use based on the model parameter
+    const modelName = model === 'gemini-1.5-pro' ? 'gemini-1.5-pro-latest' : 'gemini-1.5-flash-latest'
+    console.log(`Using Gemini model: ${modelName}`)
+
+    // Use specified Gemini model
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
