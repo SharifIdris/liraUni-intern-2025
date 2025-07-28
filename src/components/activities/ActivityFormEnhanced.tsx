@@ -14,6 +14,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const ActivityFormEnhanced = () => {
+  console.log('ActivityFormEnhanced component loaded successfully');
+  
   const { profile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -29,6 +31,8 @@ const ActivityFormEnhanced = () => {
   });
 
   const generateContent = async () => {
+    console.log('Generate content called with:', { title: formData.title, description: formData.description });
+    
     if (!formData.title.trim() || !formData.description.trim()) {
       toast({
         title: "Required Fields Missing",
@@ -71,6 +75,7 @@ Keep each section detailed and professional for an intern's activity report.`,
 
       if (data?.response) {
         const response = data.response;
+        console.log('AI response received:', response);
         
         // Parse the structured response
         const detailedWork = response.match(/\*\*DETAILED WORK PERFORMED:\*\*(.*?)(?=\*\*|$)/s)?.[1]?.trim() || '';
@@ -117,6 +122,7 @@ Keep each section detailed and professional for an intern's activity report.`,
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Submit called with step:', step);
     
     if (!formData.detailedWork.trim() || !formData.challenges.trim() || !formData.lessonsLearnt.trim()) {
       toast({
