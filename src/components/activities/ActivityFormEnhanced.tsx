@@ -12,7 +12,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { UnifiedActivityGenerator } from './UnifiedActivityGenerator';
+import { GeminiActivityGenerator } from './GeminiActivityGenerator';
 
 const ActivityFormEnhanced = () => {
   const { profile } = useAuth();
@@ -74,7 +74,7 @@ const ActivityFormEnhanced = () => {
 
   return (
     <div className="space-y-6">
-      <UnifiedActivityGenerator onGenerated={setContent} />
+      <GeminiActivityGenerator onGenerated={setContent} />
       
       <Card>
         <CardHeader>
