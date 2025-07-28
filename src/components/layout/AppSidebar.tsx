@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -42,10 +43,40 @@ export function AppSidebar() {
   const collapsed = !open;
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('activity');
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    if (profile?.role === 'staff') {
+      fetchPendingCount();
+    }
+  }, [profile]);
+
+  const fetchPendingCount = async () => {
+    if (!profile || profile.role !== 'staff') return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('activities')
+        .select('id')
+        .eq('status', 'pending');
+      
+      if (!error && data) {
+        setPendingCount(data.length);
+      }
+    } catch (error) {
+      console.error('Error fetching pending count:', error);
+    }
+  };
 
   const navigationItems: NavigationItem[] = [
     { title: 'Activity', url: '#activity', icon: Activity, role: 'all' },
-    { title: 'Pending Reviews', url: '#pending', icon: Clock, badge: '3', role: 'staff' },
+    { 
+      title: 'Pending Reviews', 
+      url: '#pending', 
+      icon: Clock, 
+      badge: pendingCount > 0 ? pendingCount.toString() : undefined, 
+      role: 'staff' 
+    },
     { title: 'Channels', url: '#channels', icon: MessageSquare, role: 'all' },
     { title: 'AI Tools', url: '#ai-tools', icon: Sparkles, role: 'intern' },
     { title: 'Reports', url: '#reports', icon: FileText, role: 'intern' },

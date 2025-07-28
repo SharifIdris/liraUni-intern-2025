@@ -19,7 +19,7 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, fullName: string, role?: 'intern' | 'staff') => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithOAuth: (provider: 'google' | 'github' | 'facebook') => Promise<{ error: any }>;
+  signInWithOAuth: (provider: 'google' | 'github' | 'linkedin_oidc') => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>;
 }
@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return { error };
   };
 
-  const signInWithOAuth = async (provider: 'google' | 'github' | 'facebook') => {
+  const signInWithOAuth = async (provider: 'google' | 'github' | 'linkedin_oidc') => {
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signInWithOAuth({

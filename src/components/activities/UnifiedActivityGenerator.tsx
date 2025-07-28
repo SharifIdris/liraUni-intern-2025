@@ -156,8 +156,12 @@ Context: This is for a university intern reporting on their work activities. Mak
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase function error:', error);
+          throw new Error(`API Error: ${error.message}`);
+        }
         if (data?.error) {
+          console.error('Function response error:', data);
           throw new Error(data.details || data.error);
         }
         if (data?.response) {
@@ -175,9 +179,10 @@ Context: This is for a university intern reporting on their work activities. Mak
       setStep('description');
     } catch (error) {
       console.error('Error generating activity:', error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       toast({
         title: "Generation Failed",
-        description: "Failed to generate activity. Please try again.",
+        description: `Failed to generate activity: ${errorMessage}. Please try again.`,
         variant: "destructive"
       });
     } finally {

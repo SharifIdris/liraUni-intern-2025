@@ -142,12 +142,12 @@ export const SimpleNotificationSystem = () => {
         className="relative"
       >
         <Bell className="h-4 w-4" />
-        {notifications.filter(n => !n.read).length > 0 && (
+        {unreadCount > 0 && (
           <Badge 
             variant="destructive" 
             className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center"
           >
-            {notifications.filter(n => !n.read).length}
+            {unreadCount}
           </Badge>
         )}
       </Button>
@@ -166,7 +166,7 @@ export const SimpleNotificationSystem = () => {
               </Button>
             </div>
             <CardDescription>
-              {notifications.filter(n => !n.read).length} unread notifications
+              {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'No unread notifications'}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">

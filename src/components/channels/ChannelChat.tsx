@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { EmojiPicker } from '@/components/ui/emoji-picker';
 import { ArrowLeft, Send, Paperclip, Smile, Users, File } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
@@ -312,19 +313,14 @@ export function ChannelChat({ channel, onBack }: ChannelChatProps) {
                 >
                   <Paperclip className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    // Simple emoji picker - add common emojis to message
-                    const emojis = ['😀', '😊', '👍', '❤️', '😂', '🔥', '👏', '🎉'];
-                    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-                    setNewMessage(prev => prev + randomEmoji);
-                  }}
-                  title="Add emoji"
-                >
-                  <Smile className="h-4 w-4" />
-                </Button>
+                <EmojiPicker
+                  onEmojiSelect={(emoji) => setNewMessage(prev => prev + emoji)}
+                  trigger={
+                    <Button variant="ghost" size="sm" title="Add emoji">
+                      <Smile className="h-4 w-4" />
+                    </Button>
+                  }
+                />
                 <input
                   id="file-upload"
                   type="file"
